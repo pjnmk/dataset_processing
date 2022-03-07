@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
 data = pd.read_csv("E:\dataset\\anime Recommendationd database\citeulike_svd_host_1000_train.csv",error_bad_lines=False)#读数据
-
+data = pd.get_dummies(data, prefix=None, dummy_na=False, columns=["iid"], sparse=False, drop_first=False) #one-hot encode
 data["uid"] = pd.factorize(data["uid"])[0].astype(np.uint64)#将特定列的字符串特征改为无符号整数形式
 
 data = data.drop(["id"],axis=1)#删除特定列
+data[['uid', 'iid']] = data[['iid', 'uid']] #两列交换
+data=data.groupby("uid").filter(lambda x: len(x) > 9)#删除数据少的行
 
 data = data.sample( frac=0.6, replace=False, axis=0)#抽样
 # n是选取的行或列个数，frac是选取的比例，replace可不可以重复选同一行，weights是权重-会选取对应列值较大的n行，random_state是随机种子，axis为0是选取行，为1是选取列。
